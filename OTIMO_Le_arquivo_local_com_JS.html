@@ -1,0 +1,79 @@
+<!-- how to read a file from the local filesystem -->
+
+<!-- 
+	Allowing the user to choose file from the device through <input> file element.
+	Step 1 — Allow User to Choose the File 
+	Nomes dos botões é default de cada browser. Se quiser alterar, use um hack: https://stackoverflow.com/questions/5138719/change-default-text-in-input-type-file
+	O botão funciona quando clica nele mas não lê o arquivo, apenas guarda no elemento #file uma propriedade "files" (array) com os nomes/propriedades dos arquivos selecionados
+	No passo 2, document.querySelector("#file-input").files acessa esse array
+-->
+<input type="file" id="file-input" />
+
+<!-- button to start reading the file -->
+<button id="read-button">Clique aqui para ler o arquivo selecionado</button>
+
+<!-- file contents will be placed here -->
+<pre id="file-contents"></pre>
+
+<!-- 
+Step 2 (opcional?) — Read File Metadata (Name, Type & Size) using Properties of File Object
+The file selected by the user can be accessed as a File object in Javascript. 
+The name, type & size properties of this File object gives the metadata of the chosen file.
+ -->
+<script>
+ document.querySelector("#read-button").addEventListener('click', function() {
+	if(document.querySelector("#file-input").files.length == 0) {
+		alert('Error : No file selected');
+		return;
+	}
+
+	// file selected by user
+	let file = document.querySelector("#file-input").files[0];
+
+	// file name
+	let file_name = file.name;
+
+	// file MIME type
+	let file_type = file.type;
+
+	// file size in bytes
+	let file_size = file.size;
+});
+
+/*
+Step 3 — Read File Contents using FileReader Object
+The contents of the selected File object is read using the FileReader object. Reading is performed asynchronously, and both text and binary file formats can be read.
+
+Text files (TXT, CSV, JSON, HTML etc) can be read using the readAsText() method.
+Binary files (EXE, PNG, MP4 etc) can be read using the readAsArrayBuffer() method.
+Data url string can be read using the readAsDataURL() method.
+*/
+document.querySelector("#read-button").addEventListener('click', function() {
+	if(document.querySelector("#file-input").files.length == 0) {
+		alert('Error : No file selected');
+		return;
+	}
+
+	// file selected by user: DEFINE QUAL O ARQUIVO A SER LIDO A PARTIR DO ARRAY DE ARQUIVOS SELECIONADOS NO PASSO 1
+	let file = document.querySelector("#file-input").files[0];
+
+	// new FileReader object *************** FUNÇÃO QUE RETORNA UM OBJETO JAVASCRIPT QUE LÊ ARQUIVOS *****************
+	let reader = new FileReader();
+
+	// read file as text file ************** CHAMADA PRINCIPAL QUE LÊ O ARQUIVO *************************
+	reader.readAsText(file);
+
+	// event fired when file reading finished
+	reader.addEventListener('load', function(e) {
+	   // contents of the file
+	    let text = e.target.result;
+	    document.querySelector("#file-contents").textContent = text;
+	});
+
+	// event fired when file reading failed
+	reader.addEventListener('error', function() {
+	    alert('Error : Failed to read file');
+	});
+
+});
+</script>
