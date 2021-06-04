@@ -1,0 +1,53 @@
+<!-- how to read a file from the local filesystem -->
+
+<style>
+	.red {
+		color: red;
+	}
+</style>
+
+<!-- 
+	Allowing the user to choose file from the device through <input> file element.
+	Step 1 — Allow User to Choose the File 
+	Nomes dos botões é default de cada browser. Se quiser alterar, use um hack: https://stackoverflow.com/questions/5138719/change-default-text-in-input-type-file
+	O botão funciona quando clica nele mas não lê o arquivo, apenas guarda no elemento #file uma propriedade "files" (array) com os nomes/propriedades dos arquivos selecionados
+	No passo 2, document.querySelector("#file-input").files acessa esse array
+
+	SÓ ACEITA DUAS EXTENSÕES: .dbk,.xml
+-->
+Passo 1: escolher o arquivo (escolher o XML do IRPF): 
+<br/>
+<i>É imprescindível passar pelo click em um <b>input type='file'</b> para acessar um arquivo!</i>
+<input type="file" class='red' id="file-input" accept=".dbk,.xml" />
+<hr/>
+
+<!-- button to start reading the file -->
+Passo 2: ler o arquivo: 
+<button id="read-button">Clique aqui para ler o arquivo selecionado</button>
+<br/>
+
+<!-- file contents will be placed here -->
+Exibir o conteúdo do arquivo lido: <span class='red' id="file-contents"></span>
+<hr/>
+Parse sem XPath, navegando no DOM manualmente:<br/>
+Tag classe > rendPJ > colecaoRendPJTitular > item, atributo rendRecebidoPJ: <span class='red' id='rendRecebidoPJ'></span>
+<hr/> 
+
+<!-- parse para JSON -->
+Parse para JSON da string carregada no passo 2:
+<br/>
+Tag: classe > bens > item[0], atributo "logradouro"<br/>
+Json: jsonFileContent.classe.bens.item[0]["@attributes"].logradouro
+<span class='red' id='json1'></span>
+<hr/> 
+
+<!-- parse de um XML online -->
+Parse do arquivo usando XPath (não funcionou, não consegui superar erro de CORS ou processar o xmlDoc):
+<button id="parse_arquivo_com_xpath">Clique aqui</button>
+<hr/>
+
+
+
+<!-- javascript com parse -->
+<script src="parse_xml.js"></script>
+

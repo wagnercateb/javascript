@@ -1,0 +1,48 @@
+https://c3js.org/gettingstarted.html
+
+<!-- Load c3.css -->
+<link href="libraries/c3-0.7.20/c3.css" rel="stylesheet">
+
+<!-- Load d3.js and c3.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.0.0/d3.min.js" referrerpolicy="no-referrer"></script>
+<script src="libraries/c3-0.7.20/c3.min.js"></script>
+
+<br/>
+Element to bind the chart:
+<div id="chart"></div>
+
+<script>
+    var chart = c3.generate({
+        data: {
+            // iris data from R
+            columns: [
+                ["cinco", 5],
+                //usar ponto como separador decimal, claro!
+                ["dez e meio", 10.5],
+                //pode jogar quantos dados quiser aqui que ele faz a somatória
+                ["doze", 3,4,5],
+                ["quinze", 15],
+            ],
+            type : 'pie',
+            //pode-se definir o que fazer quando clica na fatia
+            onclick: function (objDadosClicado, tagParaGerarEsteSlice) { 
+                console.log("onclick", objDadosClicado, tagParaGerarEsteSlice); 
+            },
+            //o comportamento do mouse over destacar a fatia náo depende desse código abaixo, é automático, depende do c3.css
+            //onmouseover: function (d, i) { console.log("onmouseover", d, i); },
+            //onmouseout: function (d, i) { console.log("onmouseout", d, i); }
+        }
+    });
+
+    //após alguns segundos, acrescenta outros dados
+    setTimeout(function () {
+        chart.load({
+            columns: [
+                ["um", 1],
+                ["um e meio", 1.5],
+                ["tres", 3],
+            ]
+        });
+    }, 5000);
+
+</script>

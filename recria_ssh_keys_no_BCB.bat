@@ -1,0 +1,1 @@
+eval $(ssh-agent) && ssh-add /c/Users/desig.cateb/.ssh/id_rsa_bcb2.ppk
