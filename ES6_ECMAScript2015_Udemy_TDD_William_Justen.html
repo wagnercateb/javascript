@@ -1,0 +1,489 @@
+<script>
+
+//USE http://jsbin.com/?console (dê enter para executar, não clique em RUN; se houver erro em qq lugar do JS, nada roda)
+//No Chrome DevTools, a variável fica no escopo mesmo que dê refresh na página... (mas roda até o ponto em que ocorre o erro)
+
+//Temporal dead zone e hoisting
+//faz hoisting com var? (acho que não)
+console.log(a);	//quando o console fica com a variável na memória, aqui não dá erro... Deveria!
+var a = 1; console.log(a); //1
+var a = 2; console.log(a); //2
+//não faz hoisting com let e const:
+let a = 1; //erro: Identifier 'a' has already been declared
+console.log(a);
+const a = 1; //erro: Identifier 'a' has already been declared
+
+
+//********* diferenças entre let e var:
+//let tem escopo do bloco, seja function ou não, e pode ser igual a uma variável global declarada com var
+var a = 1; {
+    //let: escopo de bloco
+	let a = 2;
+    console.log(a); //2
+}
+console.log(a); //1
+
+var a = 1;
+function b() { //let: escopo bloco vale para bloco de função!
+    let a = 2;
+    console.log(a); 
+}
+b(); //2
+console.log(a); //1
+
+//se let for declarada no escopo "global", ela PODE ser redeclarada dentro de um bloco
+//(no Chrome DevTools dá erro mas no http://jsbin.com/?console não! É coisa do DevTools...)
+let a = 1; {
+    let a = 2;	//no jsbin dá certo, no DevTools dá erro; acho que jsbin tá certo
+    console.log(a);
+}
+console.log(a); 
+
+//...nem dentro de função
+let a = 1;
+function b() {
+    let a = 2;
+    console.log(a); //2
+}
+b(); //2
+console.log(a); //1
+
+// At the top level of programs and functions, let, unlike var, does not create a property on the global object.For example:
+var x = 'global';
+let y = 'global';
+console.log(this.x); // "global"
+console.log(this.y); // undefined
+
+//var tem escopo de função, mas não de bloco simples (nesse caso, vale o escopo global)
+var a = 1;
+function b() {
+    var a = 2; //var funciona com escopo de funçao...
+    console.log(a);
+}
+b(); //2
+console.log(a); //1
+//...mas não funciona se for só escopo de bloco:
+var a = 3; 
+{
+    var a = 4;
+    console.log(a); //4
+}
+console.log(a); //4
+
+
+//********* default parameters
+function t1(p1, p2 = 'default p2') {
+    //antes do ES6
+    p1 = p1 || 'default p1'
+    console.log(p1) //default p1
+
+    //agora
+    console.log(p2) //default p2
+}
+//executa a função
+t1()
+
+
+//********* shorthand properties
+//para criar objetos cujas propriedades tem os mesmos nomes das variáveis com seus valores, basta citar as variáveis
+var var1 = 'teste'
+
+//antes
+obj1 = { var1: var1, func1: function() { console.log('ok1') } }
+console.log(obj1)
+obj1.func1()	//ok1
+
+//ES6
+obj2 = { var1, func2() { console.log('ok2') } }
+console.log(obj2)
+obj2.func2()	//ok2
+
+
+//********* Array.from
+/* No html:
+    <ul id="list">
+        <li>Willian</li>
+        <li>Jonas</li>
+        <li>Gabriel</li>
+    </ul>    */
+
+//retorna nodeList com elementos HTMLLIElement (os <li>); é Array com maiúscula: é método da classe
+const list = document.querySelectorAll('#list li');
+console.log(list)
+
+//NÃO FUNCIONA NO JSBIN, TEM QUE SER NO DEVTOOLS:
+//retorna um array com elementos HTMLLIElement, só que agora posso usar métodos do Array no resultado
+const listArray = Array.from(list);
+console.log(listArray);
+
+//NÃO FUNCIONA NO JSBIN, TEM QUE SER NO DEVTOOLS:
+//sendo array, é bom para programação funcional, que usa muito os métodos filter(), reduce(), map()
+//ex.: aqui é criado um array só com os textos dos <li>
+const names = listArray.map(name => name.textContent);
+console.log(names);
+
+
+
+//********* Array.of cria um array rapidamente
+let a = Array.of(1, 2, 3, 'string', { prop1: 1, prop2: 2 })
+console.log(a) // [1, 2, 3, "string", {…}]
+
+
+
+//********* Array.find(), .filter(), .findIndex() 
+const sampleArray = [4, -5, 0, -1];
+
+//find, findIndex e filter esperam uma função; se ela retornar true, o elemento é retornado, senão volta vazio
+//find retorna um escalar e para no primeiro para o qual a expr for true
+const comFind = sampleArray.find(x => x < 0); console.log(comFind); // -5
+
+//filter varre o array todo e retorna um array dos elementos para os quais a expr for true
+const filtrado = sampleArray.filter(x => x < 0); console.log(filtrado); // [-5, -1]
+
+//findlIndex retorna o índice do 1o elemento encontrado dentro do array
+const indexComFind = sampleArray.findIndex(x => x < 0); console.log(indexComFind); // 1
+
+//filter com array de objetos
+const data = [
+    { pro1: 'apple', prop2: 'maca' },
+    { pro1: 'lemon', prop2: 'limao' },
+    { pro1: 'apple', prop2: 'maçã' }
+]
+const macas = data.filter(fruta => fruta.pro1 === 'apple'); console.log(macas);
+//[ { pro1: 'apple', prop2: 'maca' }, { pro1: 'apple', prop2: 'maçã' } ]
+
+
+
+//********* Array.fill()
+//cria um array de 50 elementos com 'lol' em todos eles
+const arr1 = new Array(50);
+arr1.fill('lol')
+
+//cria array de 50 e preenche 'lol' dos índices 3 a 6
+const arr2 = new Array(50);
+arr2.fill('lol', 3, 6);
+
+const newArr = [1, 2, 3, 4, 5, 6];
+newArr.fill('lol', 1, 3); //[1, "lol", "lol", 4, 5, 6]
+
+
+
+//********* Destructuring objects
+var data = {
+    name: 'Willian',
+    surname: 'Justen',
+    age: 25,
+    social: {
+        twitter: '@Willian_Justen',
+    }
+};
+
+const { name, age } = data; //'Willian', 25
+const { twitter } = data.social; //'@Willian_Justen'
+
+//pode-se criar um alias para a propriedade ficar com outro nome
+const { twitter: alias2 } = data.social; //alias2 = '@Willian_Justen'; twitter = '@Willian_Justen'
+
+//pode-se definir um default; se a propriedade não existir, usa o default, senão, pega o valor correto
+const { city = 'Dublin' } = data; // Dublin pois a propriedade data.city não existe, senão a pegaria
+
+//não é exatamente um destructuring mas é análogo
+import { React } from 'react' //carrega só o método React do módulo 'react'
+
+
+
+//********* Destructuring arrays
+const [name, surname, age, city] = ['Willian', 'Justen', 26, 'Dublin'];
+console.log(surname); //Justen
+
+
+
+//********* Swap de variáveis com destructuring
+let [c, d] = [3, 4]
+console.log(c, d); //3,4; se não usar ; após esse método log(), dá erro!!!!
+[d, c] = [c, d]
+console.log(c, d); //4,3; se não usar ; após esse método log(), dá erro
+
+
+
+
+//********* SPREAD operator 
+//	faz um array ser tratado como elementos individuais, como se fizesse um .each nele
+console.log([...'will']); // ["w", "i", "l", "l"]
+
+let front = ['react', 'vue', 'angular'];
+console.log(...front); // react vue angular (separa por espaço)
+console.log(front); //["react", "vue", "angular"]
+
+//concatenando com outros arrays
+let back = ['python', 'ruby', 'nodejs'];
+let fullStack = [...front, 'RxJS', ...back]; //["react", "vue", "angular", "RxJS", "python", "ruby", "nodejs"]
+
+//para passar os parâmetros usando um array com eles e spread operator, ao invés de passar seus elementos um a um:
+function makeSandwich(bread, cheese, sauce) {
+    console.log(`Your sandwich with ${bread} bread, ${cheese} cheese and ${sauce} is done!`);
+}
+const ingredients = ['white', 'cheddar', 'barbecue'];
+//passando o array com o spread operator, os valores caem nas posições certas dos parâmetros da função
+makeSandwich(...ingredients);
+
+
+
+
+//********* REST parameters
+//com spread operator nos parâmetros, pode-se passar n parâmetros que eles serão encaixados em uma matriz de argumentos
+function multiply(mult, ...matrizDeArgs) {
+    return matrizDeArgs.map(arg => arg * mult);
+}
+console.log(multiply(5, 1, 2, 3, 4, 5, 6)); //[5, 10, 15, ...]
+
+
+
+//********* Template literals (com backtick)
+const ireland = {live:'Dublin', love:'Galway'};
+//com backtick pode-se fazer interpolação de variáveis ou qualquer conteúdo JS (inclusive funções)
+const newText = `Eu moro em ${ireland.live} e sou apaixonado por ${ireland.love}!`;
+console.log(newText);		//Eu moro em Dublin e sou apaixonado por Galway!
+
+//o backtick também garante quebras de linha só com enter, sem ter que usar \n:
+const newFruits = `bannana
+orange`; console.log(newFruits);
+
+
+//********* BACKTICK PARA FAZER TEMPLATES
+const article = {
+  title: 'Aprendendo Template Strings',
+  intro: 'Uma breve explicação ',
+  tags: ['es6', 'js', 'template-literal']
+};
+
+//TEMPLATE PERFEITO!: esta função pode ser chamada diretamente dentro do backtick, não precisa nenhuma biblioteca de template JS para isso
+function renderAuthor(name) {
+  return (name) ? name : 'unknown';
+}
+//TEMPLATE usando backtick:
+const markup = `
+	<html>
+	<header>
+		<!-- BASTA MENCIONAR A PROPRIEDADE DO OBJETO AQUI -->
+		<h1>${article.title}</h1> 
+	</header>
+	<footer>
+		<ul>
+			<!--	CHAMADA A UMA ARROW FUNCTION DENTRO DE UM map(); 
+					O .join('') serve para não retornar vírgulas entre elementos do map   -->
+			${article.tags.map((tag) => `<li>${tag}</li>`).join('')}  
+		</ul>
+		<!-- CHAMADA DIRETA À FUNÇÃO JS (MUITO USADO NO REACT JSX), O ${...} É EXTERNO -->
+		<p>Author: ${renderAuthor(article.author)}</p> 
+	</footer>
+	</html>
+`;
+document.body.innerHTML = markup;
+
+
+
+//********* ARROW FUNCTIONS
+const ireland = ['Dublin', 'Galway', 'Cork'];
+//ES6 permite template literals tipo `eu me chamo ${nome_de_uma_variavel}`
+const love = ireland.map(function(name) {
+	//map faz a interação pelos elementos do array e devolve um array com todos os elementos que forem retornados
+	return `I love ${name}!`;
+ });
+console.log(love)	//array: ["I love Dublin!", "I love Galway!", "I love Cork!"]
+
+//na arrow function, não precisa escrever a palavra "function":
+ const loveArrow = ireland.map((name) => {
+	return `I love ${name}!`;
+ });
+console.log(loveArrow)
+
+//se for só um parâmetro, não precisa usar nem parênteses:
+ const loveArrowSingle = ireland.map(name => {
+	return `I love ${name}!`;
+ });
+console.log(loveArrowSingle)
+
+//se for só uma instrução, não precisa inseri-la dentro de um bloco {...} 
+//	NEM USAR RETURN (se não tiver chaves), é automático retornar o resultado da instrução
+const loveArrowOneLine = ireland.map(name => `I love ${name}!`);
+console.log(loveArrowOneLine)
+
+//escrevendo em uma linha, fica mais fácil e claro fazer chaining:
+ const loveChain = ireland
+					//o método .filter() retorna só o elemento para o qual for verdadeira a expressão com o operador === :
+					.filter(name => name === 'Dublin')
+					.map(name => `I love ${name}!`);
+ console.log(loveChain);
+
+
+ //ver REDUCE em https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/Reduce, "how reduce works"
+
+ //ver como iterar em dictionary para varias versoes de JS: https://stackoverflow.com/questions/34913675/how-to-iterate-keys-values-in-javascript
+
+
+//********* This nas arrow functions
+//This, no Arrow Function, refere-se ao contexto do objeto em que ela está (lexical scope), e não ao contexto do objeto que a chamou. 
+//Muito útil em funções dentro de funções pois o contexto é o objeto onde elas estão!
+const sandwich = {
+  bread: 'white',
+  cheese: 'cheddar',
+  prepare: function() {
+    return `I want a sandwich with ${this.bread} bread and ${this.cheese} cheese!`;
+  },
+  make: function() {
+    //usando arrow function aqui, o contexto do 'this' é o objeto 'sandwich'
+    //se fosse "window.setTimeout(function() {...this...})", o contexto do 'this' seria o objeto 'window'
+    	window.setTimeout(() => {
+      console.log( this.prepare() );
+    }, 500);
+  }
+};
+console.log(sandwich)	//objeto {bread: "white", cheese: "cheddar", prepare: ƒ, make: ƒ}
+ 
+//Chamando a função make() acima em eventos do DOM:
+const btn = document.getElementById('btn');
+btn.addEventListener('click', function() { sandwich.make() });
+
+//CUIDADO, não é bala de prata, tem hora que é melhor NÃO usar arrow function. Ex.:
+const btn = document.getElementById('btn')
+btn.addEventListener('click', function() {
+     console.log(this);	//aqui, this vai se referir ao botão; 
+						//SE FOSSE ARROW FUNCTION, SE REFERIRIA À WINDOWS onde o botão está
+})
+ 
+ 
+//********* PROMISES
+//As promises são úteis em métodos assíncronos (que ficam com execução pendente em background, sem travar o thread atual)
+//O construtor da classe Promise espera dois métodos:
+//	resolve(): será executado se der tudo certo
+//	reject(): será executado se ocorrer um erro (throw new Exception dispara-o)
+//Aqui é criada a promise no objeto chamado 'defer':
+var defer = new Promise((resolve, reject) => {
+    //código interno a executar quando o objeto 'defer' for invocado (mais abaixo): é como uma chamada de função, porém sem argumento e sem parênteses
+    //setTimeout() "simula" um código assíncrono: seu conteúdo só é executado após o último parâmetro em milissegundos (aqui, após 1 segundo)
+    setTimeout(() => {
+        //como o if está recebendo a constante 'true', o resolve() sempre será invocado
+        if (true) {
+            //método resolve(arg) passa os argumentos a serem recebidos no método .then do objeto defer
+            //quando cair aqui, a linha defer.then('Hello!') executará
+            resolve('Hello!');
+            //o throw abaixo não cairia no .catch da promise, daria um erro "uncaught error"
+            //throw new Error('caiu neste erro')
+        } else {
+            //reject(arg) passa parâmetros que o método defer.catch(arg) receberá
+            reject('Error!');
+        }
+        //esse parâmetro fará o if (após o setTimeout) ser executado após 1 segundo
+    }, 1000);
+
+});
+
+//como invocar a promise: aqui ele chama a promise, executando seu código interno
+//pode-se fazer chaining, usando .then() um após o outro
+//.then é chamado pelo resolve() dentro da promise; .catch é chamado pelo reject()
+defer
+//como método só recebe um parâmetro (data1), o parênteses é opcional na arrow function
+    .then((data1) => {
+        console.log('1o .then: ' + data1);
+        return 'foo'; //o conteúdo do return será passado como parâmetro para o próximo .then da chain
+    })
+    .then(data2 => console.log('2o .then: ' + data2))
+    .then(data3 => {
+        console.log('3o. then: faz o throw'); //esse .then ocorre naturalmente, mesmo sem return do .then anterior
+        throw new Error('msg de erro') //throw dispara o .catch da promise
+    })
+    //o 4o then abaixo não é executado porque o throw acima desvia a fluxo para o .catch
+    .then(data4 => console.log('4o .then: ' + data4))
+    //após o throw dentro do 3o .then, esse .catch é executado
+    //o return true NÃO faz o defer voltar para o 4o. then, que nunca é executado
+    .catch((err) => { console.log(err); return true })
+    //também não há porque cair no 2o catch (abaixo) porque o catch acima resolveu o throw (mesmo se ele retornasse false)
+    .catch((err) => { console.log('2o catch executado') })
+
+
+//exemplo prático: a promise é usada aqui porque só é para chamar o console.log quando o fetch tiver retornado toda a página
+//fetch é tipo um $.ajax() mas já segue o protocolo do Promise; é assíncrono, demora um pouco até trazer os dados via internet
+var posts = fetch('https://willianjusten.com.br/search.json');
+//possíveis estados da promisse após ser chamada: pending, resolved, rejected
+//assim que o código é executado, o console mostra a Promise com status "pending"
+posts
+//fetch espera qq tipo de retorno, então primeiro converto o retorno genérico em json (MESMO nessa página, que já retorna json!)
+//  O data que retorna aqui é:  { type: "cors", url: "https://willianjusten.com.br/search.json", redirected: false, status: 200, ok: true,  … }
+//Não entendi porque não posso usar "return data.json()" nesse .then, dá erro; retorno só com "data.json()" mesmo
+    .then(data => data.json()) //nesse ponto o status da promise já virou 'resolved'
+    //depois de executar o .then acima, continua executando o .then abaixo
+    .then(data => data.map(post => {
+        console.log(post.title);
+    }));
+
+
+
+//********* 
+
+
+
+//********* 
+
+
+
+//********* 
+
+
+
+//********* 
+
+
+
+//********* 
+
+
+
+//********* 
+
+
+
+//********* 
+
+
+
+//********* 
+
+
+
+//********* 
+
+
+
+//********* 
+
+
+
+//********* 
+
+
+
+//********* 
+
+
+
+//********* 
+
+
+
+//********* 
+
+
+
+//********* 
+
+
+
+//********* 
+
+
+
+//*********
+
+</script>
+</html>
