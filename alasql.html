@@ -1,4 +1,4 @@
-<h2>alasql permite fazer join com bancos de dados e objetos Json</h2>
+<h2>alasql permite fazer join no JS com bancos de dados e objetos Json</h2>
 
 <p>Right join: <span id="join"></span></p>
 
@@ -15,8 +15,9 @@
                     ]
                 };
 
-    data.NEW_FRUITS = alasql('SELECT MATRIX COLORS.[0], ISNULL(COLORS.[1], "NULO"), FRUITS.[1] AS [2] FROM ? AS COLORS right JOIN ? AS FRUITS ON COLORS.[0] = FRUITS.[0]',[data.COLORS, data.FRUITS]);
-
+    //outer join básico
+    data.NEW_FRUITS = alasql(`SELECT MATRIX COLORS.[0], ISNULL(COLORS.[1], "NULO"), FRUITS.[1] 
+        FROM ? AS COLORS right JOIN ? AS FRUITS ON COLORS.[0] = FRUITS.[0]`,[data.COLORS, data.FRUITS]);
     document.getElementById("join").textContent = JSON.stringify(data.NEW_FRUITS);
 
 
